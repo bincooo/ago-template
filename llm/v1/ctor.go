@@ -53,23 +53,23 @@ func init() {
 				}
 
 				if completion.Stream {
-					ctx.SSE(func(writer func(interface{}) error) {
-						chunkBodies := createChannel(response)
+					ctx.StreamWriter(func(w func(interface{}) error) {
+						chunkChan := createChannel(ctx, response)
 						for {
-							bodies, ok := <-chunkBodies
+							bodies, ok := <-chunkChan
 							if !ok {
-								err = writer(io.EOF)
+								err = w(io.EOF)
 								return
 							}
 
-							err = writer(model.MakeSSEResponse(bodies.Chunk, unix))
+							err = w(model.CreateStreamResponse(bodies.chunk, unix))
 						}
 					})
 					return
 				}
 
-				chunkBodies := waitChannel(response)
-				return ctx.JSON(model.MakeResponse(chunkBodies.Chunk, unix))
+				bodies := waitChannel(ctx, response)
+				return ctx.Writer(model.CreateResponse(bodies.chunk, unix))
 			})
 	})
 }

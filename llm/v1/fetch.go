@@ -21,13 +21,16 @@ func fetch(ctx *model.Ctx) (r *resty.Response, err error) {
 	completion = kit.Copy(completion)
 
 	splinter := strings.Split(completion.Model, "/")
-	mod := strings.Join(splinter[1:], "/")
+	mod := completion.Model
 	prefix := splinter[0]
 	reversal := "undefined"
 
 	for _, rec := range schema {
 		if rec.ValueEqual("prefix", prefix) {
 			reversal = model.JustValue[string, string](rec, "reversal")
+			if model.JustValue[string, bool](rec, "trim") {
+				mod = strings.Join(splinter[1:], "/")
+			}
 			break
 		}
 	}

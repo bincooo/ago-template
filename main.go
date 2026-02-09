@@ -7,5 +7,5 @@ import (
 )
 
 func main() {
-	ago.Run()
+	ago.Execute()
 }

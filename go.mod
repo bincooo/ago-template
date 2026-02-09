@@ -1,24 +1,19 @@
 module adapter
 
-go 1.24.0
+go 1.25
 
 require (
-	github.com/bincooo/ago v0.0.0-20250907160707-6f990ccc224c
+	github.com/bincooo/ago v0.0.0-20260209001622-0ae82f053134
 	github.com/go-resty/resty/v2 v2.17.1
 )
+
+replace github.com/bincooo/ago v0.0.0-20260209001622-0ae82f053134 => ../ago
 
 require (
 	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/bincooo/ja3 v0.0.0-20250809061016-e32ddf230191 // indirect
-	github.com/chromedp/cdproto v0.0.0-20250724212937-08a3db8b4327 // indirect
-	github.com/chromedp/chromedp v0.14.1 // indirect
-	github.com/chromedp/sysutil v1.1.0 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
-	github.com/go-json-experiment/json v0.0.0-20250725192818-e39067aee2d2 // indirect
 	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
-	github.com/gobwas/httphead v0.1.0 // indirect
-	github.com/gobwas/pool v0.2.1 // indirect
-	github.com/gobwas/ws v1.4.0 // indirect
 	github.com/gofiber/contrib/fiberzap/v2 v2.1.6 // indirect
 	github.com/gofiber/fiber/v2 v2.52.11 // indirect
 	github.com/google/uuid v1.6.0 // indirect
@@ -47,6 +42,6 @@ require (
 	golang.org/x/crypto v0.41.0 // indirect
 	golang.org/x/net v0.43.0 // indirect
 	golang.org/x/sys v0.38.0 // indirect
-	golang.org/x/text v0.31.0 // indirect
+	golang.org/x/text v0.33.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 )

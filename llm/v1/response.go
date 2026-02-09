@@ -11,32 +11,37 @@ import (
 )
 
 type chunkBodies struct {
-	Chunk string
-	Think string
+	chunk string
+	think string
 }
 
-func waitChannel(r *resty.Response) *chunkBodies {
-	channel := createChannel(r)
-	var chunk chunkBodies
+func waitChannel(ctx *model.Ctx, response *resty.Response) *chunkBodies {
+	channel := createChannel(ctx, response)
+	var newBodies chunkBodies
 	for {
 		bodies, ok := <-channel
 		if !ok {
 			break
 		}
-		chunk.Chunk += bodies.Chunk
-		chunk.Think = bodies.Think
+		newBodies.chunk += bodies.chunk
+		newBodies.think = bodies.think
 	}
-	return &chunk
+	return &newBodies
 }
 
-func createChannel(r *resty.Response) chan *chunkBodies {
+func createChannel(ctx *model.Ctx, response *resty.Response) chan *chunkBodies {
 	channel := make(chan *chunkBodies)
 	go func() {
 		defer close(channel)
 
-		response := r.RawResponse
-		scanner := bufio.NewScanner(response.Body)
+		raw := response.RawResponse
+		scanner := bufio.NewScanner(raw.Body)
 		for {
+			if ctx.IsConnClosed() {
+				logger.Sugar().Errorf("客户端已断开连接，停止处理")
+				return
+			}
+
 			if !scanner.Scan() {
 				if err := scanner.Err(); err != nil {
 					logger.Sugar().Error(err)
@@ -45,8 +50,8 @@ func createChannel(r *resty.Response) chan *chunkBodies {
 			}
 
 			data := scanner.Text()
-			logger.Sugar().Debugf("--------- ORIGINAL MESSAGE ---------")
-			logger.Sugar().Debugf("%s", data)
+			//logger.Sugar().Debugf("--------- ORIGINAL MESSAGE ---------")
+			//logger.Sugar().Debugf("%s", data)
 
 			if len(data) < 6 || data[:6] != "data: " {
 				continue
@@ -77,16 +82,16 @@ func createChannel(r *resty.Response) chan *chunkBodies {
 				continue
 			}
 
-			raw := choice.Delta.Content
+			chunk := choice.Delta.Content
 			logger.Sugar().Debug("----- raw -----")
-			logger.Sugar().Debug(raw)
+			logger.Sugar().Debug(chunk)
 
-			if len(raw) == 0 {
+			if len(chunk) == 0 {
 				continue
 			}
 
 			channel <- &chunkBodies{
-				Chunk: raw,
+				chunk: chunk,
 			}
 		}
 	}()
